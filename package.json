@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@paypal/react-paypal-js": "^9.1.1",
     "axios": "^1.15.2"
   }
 }

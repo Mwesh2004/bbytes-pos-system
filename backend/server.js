@@ -55,7 +55,66 @@ app.post('/api/mpesa/stkpush', async (req, res) => {
   }
 })
 
-const PORT = 3000
+// Paystack Payment Verification
+app.post('/api/paystack/verify', async (req, res) => {
+  try {
+    const { reference } = req.body
+    
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`
+        }
+      }
+    )
+    
+    res.json(response.data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// PayPal Payment Verification
+app.post('/api/paypal/verify', async (req, res) => {
+  try {
+    const { orderID } = req.body
+    
+    // Get PayPal access token
+    const auth = Buffer.from(
+      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
+    ).toString('base64')
+    
+    const tokenRes = await axios.post(
+      'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+      'grant_type=client_credentials',
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    )
+    
+    const accessToken = tokenRes.data.access_token
+    
+    // Verify order
+    const verifyRes = await axios.get(
+      `https://api-m.sandbox.paypal.com/v2/checkout/orders/${orderID}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    )
+    
+    res.json(verifyRes.data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

@@ -8,6 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
+const ADMIN_URL = 'http://localhost:3000/admin'
 
 app.get('/', (req, res) => {
   if (req.headers.accept && req.headers.accept.includes('text/html')) {

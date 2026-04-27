@@ -7,8 +7,49 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000'
+
 app.get('/', (req, res) => {
-  res.json({ message: 'POS System is running!' })
+  if (req.headers.accept && req.headers.accept.includes('text/html')) {
+    return res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>BBytes POS System - Backend API</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            .container { text-align: center; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 500px; }
+            h1 { color: #333; margin: 0 0 10px 0; }
+            p { color: #666; margin: 10px 0; }
+            .status { background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #2e7d32; }
+            a { display: inline-block; margin-top: 20px; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background 0.3s; }
+            a:hover { background: #764ba2; }
+            .api-info { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left; font-size: 14px; }
+            code { background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>🎉 BBytes POS System</h1>
+            <p>Backend API is running!</p>
+            <div class="status">
+              <strong>✓ API Server Active</strong><br>
+              Backend is ready to accept requests
+            </div>
+            <p>To access the POS System UI, go to:</p>
+            <a href="${FRONTEND_URL}">${FRONTEND_URL}</a>
+            <div class="api-info">
+              <strong>API Endpoints:</strong><br>
+              POST <code>/api/mpesa/stkpush</code> - M-Pesa payment<br>
+              POST <code>/api/paystack/verify</code> - Paystack verification<br>
+              POST <code>/api/paypal/verify</code> - PayPal verification
+            </div>
+          </div>
+        </body>
+      </html>
+    `)
+  }
+  res.json({ message: 'POS System is running!', frontend: FRONTEND_URL })
 })
 
 app.post('/api/mpesa/stkpush', async (req, res) => {
@@ -114,7 +155,8 @@ app.post('/api/paypal/verify', async (req, res) => {
   }
 })
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3002
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
+  console.log(`Frontend redirect URL: ${FRONTEND_URL}`)
 })

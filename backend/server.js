@@ -48,8 +48,9 @@ const sanitizeInput = (req, res, next) => {
   const recurse = (obj) => {
     if (Array.isArray(obj)) return obj.map(recurse)
     if (obj && typeof obj === 'object') {
-      return Object.fromEntries(
+      return Object.fromEntries (
         Object.entries(obj).map(([k, v]) => [sanitize(k), recurse(v)])
+      )
     }
     return sanitize(obj)
   }
@@ -309,8 +310,9 @@ const requirePermission = (permission) => {
   return (req, res, next) => {
     if (!req.user || !req.user.role) {
       return res.status(403).json({ error: 'Access denied. No role specified.' })
-    }
 
+    }
+  }
     const userRole = req.user.role
     const allowedPermissions = rolePermissions[userRole] || []
 
@@ -433,3 +435,7 @@ app.listen(PORT, () => {
   console.log(`🔒 Rate Limiting: ENABLED`)
   console.log(`🛡️ Security Middleware: ACTIVE`)
 })
+      return res.status(403).json({   error: 'Access denied. Missing required permission.', required: permission, currentRole: userRole })
+    next()}
+
+} 

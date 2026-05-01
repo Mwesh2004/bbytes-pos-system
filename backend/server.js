@@ -140,7 +140,7 @@ const mpesaLimiter = makeLimiter(5, 60 * 1000, 'Too many M-Pesa requests. Try ag
 const speedLimiter = slowDown({
   windowMs:         15 * 60 * 1000,
   delayAfter:       50,
-  delayMs:          500,
+  delayMs: () => 500,
   skip: req => NODE_ENV === 'test',
 })
 

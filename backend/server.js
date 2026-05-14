@@ -26,10 +26,12 @@ const REQUIRED_ENV = [
   'PAYSTACK_SECRET_KEY',
 ]
 const missingEnv = REQUIRED_ENV.filter(k => !process.env[k])
-if (missingEnv.length) {
-  console.error('[FATAL] Missing required environment variables:', missingEnv.join(', '))
-  process.exit(1)
+const hasAllRequiredEnv = missingEnv.length === 0
+if (!hasAllRequiredEnv) {
+  console.warn('[WARN] Missing required environment variables:', missingEnv.join(', '))
+  console.warn('[WARN] Server will start, but some payment/auth-related endpoints may be disabled until env is set.')
 }
+
 
 const JWT_SECRET         = process.env.JWT_SECRET
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET
